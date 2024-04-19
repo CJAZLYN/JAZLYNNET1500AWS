@@ -1,0 +1,34 @@
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+
+const sqsClient = new SQSClient({ region: "us-east-1" });
+const url = "https://gdsapi.cnbc.com/market-mover/groupMover/SP500/CHANGE_PCT/BOTH/12.json?source=SAVED&delayed=false&partnerId=2";
+
+export const handler = async (event) => {
+  try {
+    const res = await fetch(url);
+    console.info("status", res.status);
+    const msg = await res.json();
+    
+    console.log("big mover list");
+    console.log(msg);
+    const params = {
+      QueueUrl: "https://sqs.us-east-1.amazonaws.com/654654201244/Jazlyn-net1500-quene",
+      MessageBody: JSON.stringify(msg),
+    };
+    const sent = await sqsClient.send(new SendMessageCommand(params));
+    console.log("Message sent successfully!")
+
+    return {
+      statusCode: 200,
+      body: "Message sent successfully!",
+    };
+  }
+  catch (error) {
+    console.log("Error sending message:", error);
+    return {
+      statusCode: 500,
+      body: "Error sending message to SQS.",
+    };
+  }
+};
+
