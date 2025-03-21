@@ -1,0 +1,4 @@
+sudo apt update
+-- updates new packages.
+sudo usermod -aG wireshark jazlyn
+-- To capture packets without running Wireshark as root
